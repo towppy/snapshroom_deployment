@@ -3,15 +3,15 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
+    "start": "serve -s dist -l $PORT",
+    "build-web": "expo export --web --output dist",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "web-build": "expo build:web",
-    "start": "serve -s dist -l $PORT",
     "lint": "expo lint"
   },
+  
   "dependencies": {
     "@expo/vector-icons": "^14.0.4",
     "@react-google-maps/api": "^2.20.8",
