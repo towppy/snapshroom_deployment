@@ -1,0 +1,66 @@
+{
+  "expo": {
+    "name": "SnapShroom",
+    "slug": "snapshroom",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.snapshroom"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.jssrosario.snapshroom",
+      "permissions": [
+        "CAMERA",
+        "android.permission.CAMERA"
+      ],
+      "softwareKeyboardLayoutMode": "pan"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0",
+            "enableProguardInReleaseBuilds": true,
+            "kotlinVersion": "1.8.0"
+          }
+        }
+      ],
+      "expo-camera",
+      "expo-image-picker",
+      "expo-router"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "5dea80b7-3eaf-462e-9af1-47224849b11f"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/5dea80b7-3eaf-462e-9af1-47224849b11f"
+    },
+    "newArchEnabled": false
+  }
+}

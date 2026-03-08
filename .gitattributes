@@ -1,0 +1,33 @@
+# Git LFS for large model files
+backend/models/*.pth filter=lfs diff=lfs merge=lfs -text
+
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Force LF line endings for dataset label files (YOLO format)
+backend/datasets/**/*.txt text eol=lf
+backend/snapshroom_dataset/**/*.txt text eol=lf
+
+# Force LF for source code files
+*.py text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.mov binary
+*.mp4 binary
+*.mp3 binary
+*.zip binary

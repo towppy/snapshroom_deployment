@@ -1,0 +1,32 @@
+{
+  "overall_accuracy": 0.8539325842696629,
+  "test_split": "test",
+  "total_samples": 89,
+  "per_class_accuracy": {
+    "Enoki Mushroom": {
+      "accuracy": 0.7619047619047619,
+      "correct": 16,
+      "total": 21
+    },
+    "Wood Ear Mushroom": {
+      "accuracy": 0.8,
+      "correct": 12,
+      "total": 15
+    },
+    "Button Mushroom": {
+      "accuracy": 0.84375,
+      "correct": 27,
+      "total": 32
+    },
+    "White Oyster Mushroom": {
+      "accuracy": 1.0,
+      "correct": 11,
+      "total": 11
+    },
+    "Shiitake Mushroom": {
+      "accuracy": 1.0,
+      "correct": 10,
+      "total": 10
+    }
+  }
+}

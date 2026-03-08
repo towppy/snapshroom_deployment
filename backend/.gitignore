@@ -1,0 +1,70 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+*.whl
+
+# Flask instance folder
+instance/
+.webassets-cache
+
+# Pytest / coverage
+.coverage
+.tox/
+.nox/
+*.cover
+*.py,cover
+htmlcov/
+.cache
+nosetests.xml
+coverage.xml
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+
+#dataset
+backend/datasets/
+backend/**/datasets/
+datasets/
+*.zip
+*.tar
+*.tar.gz
+
+backend/models/firebase_admin.json
+backend/firebase-admin.json

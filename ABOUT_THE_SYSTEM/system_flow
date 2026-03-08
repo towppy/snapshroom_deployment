@@ -1,0 +1,122 @@
+┌─────────────────────────────────────────────────────┐
+│ USER TAKES PHOTO                                    │
+│ Frontend: camera.tsx                                │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ NAVIGATE TO PREDICTION SCREEN                       │
+│ Frontend: prediction.tsx                            │
+│ - Shows loading animation                           │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ CALL API: analyzeMushroom()                         │
+│ Frontend: utils/api.ts                              │
+│ POST /api/toxicity/predict                          │
+│ Body: { image_base64, location }                    │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ BACKEND RECEIVES REQUEST                            │
+│ Backend: routes/toxicity_routes_custom.py           │
+│ @toxicity_bp.route('/predict')                      │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ STAGE 1: YOLO DETECTION                             │
+│ Model: models/mushroom_detector.pt                  │
+│ Result: Mushroom found? Bounding box?               │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ STAGE 2: RESNET CLASSIFICATION                      │
+│ Model: models/mushroom_classifier.pth               │
+│ Result: Species = "Oyster Mushroom" (87%)           │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ STAGE 3: DATABASE QUERY                             │
+│ MongoDB: species collection                         │
+│ Query: { english_name: "Oyster Mushroom" }          │
+│ Result: Full species info (edible, habitat, etc.)   │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ SAVE SCAN RECORD                                    │
+│ MongoDB: mushroom_scans collection                  │
+│ Saves: user, species, confidence, timestamp         │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ RETURN JSON RESPONSE                                │
+│ Backend → Frontend                                  │
+│ { success, detection, classification }              │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ DISPLAY RESULTS                                     │
+│ Frontend: prediction.tsx                            │
+│ - Species name & confidence                         │
+│ - Edibility status                                  │
+│ - Safety recommendations                            │
+│ - Mushroom details from database                    │
+│ - Interactive map                                   │
+└─────────────────────────────────────────────────────┘
+
+
+
+
+
+1. User taps "Upload from Gallery"
+   ↓
+2. System requests media library permission
+   ↓
+3. User selects an image from gallery
+   ↓
+4. Image is validated (mushroom detection check)
+   ↓
+5. Image uploaded to Cloudinary (persistent storage)
+   ↓
+6. Navigate to prediction screen
+   ↓
+7. Prediction screen calls API: /api/toxicity/predict
+   ↓
+8. Backend processes image (YOLOv8 + ResNet50)
+   ↓
+9. Backend saves scan to MongoDB (mushroom_scans collection)
+   ↓
+10. Results displayed to user
+
+
+
+User scans mushroom
+    ↓
+Camera uploads to Cloudinary
+    ↓
+Prediction screen calls /api/toxicity/predict
+    WITH image_url (Cloudinary URL)
+    ↓
+Backend saves to mushroom_scans:
+    {
+      mushroom_type: "Death Cap",
+      confidence: 0.87,
+      edibility: "poisonous",
+      image_url: "https://res.cloudinary.com/..."  ← SAVED!
+      location: {...},
+      created_at: "2026-02-17..."
+    }
+    ↓
+User opens History from hamburger menu
+    ↓
+Fetches all scans with images
+    ↓
+Displays beautiful card list with thumbnails! 🎨

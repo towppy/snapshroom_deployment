@@ -1,0 +1,41 @@
+{
+  "cli": {
+    "version": ">= 6.0.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "env": {
+        "EXPO_NO_DOTENV": "true"
+      }
+    },
+    "preview": {
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease",
+        "autoIncrement": true
+      },
+      "env": {
+        "EXPO_NO_DOTENV": "true"
+      }
+    },
+    "production": {
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease",
+        "autoIncrement": true
+      },
+      "env": {
+        "EXPO_NO_DOTENV": "true"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
