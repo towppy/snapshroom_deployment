@@ -53,6 +53,7 @@ export default function HistoryScreen() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('DEBUG accessToken:', accessToken);
     fetchScanHistory();
   }, [scope, accessToken]);
 
