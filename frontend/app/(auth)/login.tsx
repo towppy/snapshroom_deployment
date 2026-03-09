@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ActivityIndicator,
   Dimensions,
   Platform,
@@ -17,19 +16,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
-import { GoogleAuthProvider, signInWithCredential, signInWithPopup } from 'firebase/auth';
 
-import { auth } from '@/firebase/config';
 import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
-import * as AuthSession from 'expo-auth-session';
-import Constants from 'expo-constants';
-
-
-WebBrowser.maybeCompleteAuthSession();
 
 const { width } = Dimensions.get('window');
 const isSmallScreen = width < 375;
@@ -41,118 +31,26 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [deactivatedModalVisible, setDeactivatedModalVisible] = useState(false);
   const [deactivatedReason, setDeactivatedReason] = useState('');
 
   const router = useRouter();
-  const { login, isLoading, error, clearError, handleGoogleAuth } = useAuth();
+  const { login, isLoading, error, clearError } = useAuth();
   const { showToast } = useToast();
 
   const passwordInputRef = useRef<TextInput>(null);
   const scrollViewRef = useRef<ScrollView>(null);
 
-  // 🔥 Google Auth Request
-  // For Expo Go: Use the Expo auth proxy URL with ONLY web client ID
-  // For standalone builds: Use the native scheme with platform-specific client IDs
-  const isExpoGo = Constants.appOwnership === 'expo';
-  const redirectUri = isExpoGo
-    ? 'https://auth.expo.io/@towppy/frontend'
-    : AuthSession.makeRedirectUri({ scheme: 'frontend' });
-
-  // In Expo Go, we MUST use only the web client ID (not android/ios client IDs)
-  // because the Expo auth proxy redirect URI is only authorized for the web client
-  const [request, response, promptAsync] = Google.useAuthRequest(
-    isExpoGo
-      ? {
-          clientId: '439538035488-7qtb0trngffe0ddt78pjsa70s5ufn417.apps.googleusercontent.com',
-          scopes: ['profile', 'email'],
-          redirectUri,
-        }
-      : {
-          clientId: '439538035488-7qtb0trngffe0ddt78pjsa70s5ufn417.apps.googleusercontent.com',
-          iosClientId: '1098545643387-5tghhjihvbujg6h7fvrs5vllj3k9nkd8.apps.googleusercontent.com',
-          androidClientId: '1098545643387-lk4dej58chjpmhefaqomoljj2j98j2lp.apps.googleusercontent.com',
-          webClientId: '439538035488-7qtb0trngffe0ddt78pjsa70s5ufn417.apps.googleusercontent.com',
-          scopes: ['profile', 'email'],
-          redirectUri,
-        }
-  );
-
-  // Debug: Log redirect URI on mount (remove in production)
-  useEffect(() => {
-    console.log('=== GOOGLE AUTH DEBUG ===');
-    console.log('isExpoGo:', isExpoGo);
-    console.log('Redirect URI:', redirectUri);
-    console.log('Client ID being used:', '439538035488-7qtb0trngffe0ddt78pjsa70s5ufn417.apps.googleusercontent.com');
-    console.log('Request object:', request);
-    console.log('=========================');
-  }, [redirectUri]);
-
-  useEffect(() => {
-    if (response?.type === 'success') {
-      const idToken = response.authentication?.idToken;
-      const accessToken = response.authentication?.accessToken;
-      handleGoogleResponse(idToken, accessToken);
-    } else if (response?.type === 'error') {
-      Alert.alert('Google Login Error', response.error?.message ?? 'Authentication failed.');
-      setGoogleLoading(false);
-    } else if (response?.type === 'dismiss') {
-      setGoogleLoading(false);
-    }
-  }, [response]);
-
-  const handleGoogleResponse = async (idToken?: string | null, accessToken?: string | null) => {
-    if (!idToken && !accessToken) {
-      Alert.alert('Google Login Error', 'No token received from Google. Make sure your webClientId is a Web Application client in Google Cloud Console and https://auth.expo.io/@Towppy/frontend is an authorized redirect URI.');
-      return;
-    }
-
-    try {
-      setGoogleLoading(true);
-
-      const credential = GoogleAuthProvider.credential(idToken ?? null, accessToken ?? undefined);
-      const userCredential = await signInWithCredential(auth, credential);
-
-      const firebaseToken = await userCredential.user.getIdToken();
-
-      await handleGoogleAuth(firebaseToken);
-      showToast('Google login successful!', 'success');
-      router.replace('/');
-    } catch (err: any) {
-      Alert.alert('Google Login Error', err.message);
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
-
-  // 🌐 Web: use signInWithPopup directly (bypasses expo-auth-session redirect issues)
-  const handleGoogleSignInWeb = async () => {
-    try {
-      setGoogleLoading(true);
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const firebaseToken = await result.user.getIdToken();
-      await handleGoogleAuth(firebaseToken);
-      showToast('Google login successful!', 'success');
-      router.replace('/');
-    } catch (err: any) {
-      Alert.alert('Google Login Error', err.message);
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
-
   const handleLogin = async () => {
     clearError();
 
     if (!email.trim() || !email.includes('@')) {
-      Alert.alert('Error', 'Please enter a valid email');
+      showToast('Please enter a valid email', 'error');
       return;
     }
 
     if (!password) {
-      Alert.alert('Error', 'Password is required');
+      showToast('Password is required', 'error');
       return;
     }
 
@@ -163,16 +61,17 @@ export default function LoginScreen() {
     } catch (err: any) {
       const code: string = err?.code || '';
       if (code === 'email_not_verified') {
-        Alert.alert(
-          'Email Not Verified',
+        showToast(
           err.message || 'Please verify your email before logging in. Check your inbox for the verification link.',
-          [{ text: 'OK' }]
+          'error',
+          5000
         );
       } else if (code === 'account_disabled') {
         setDeactivatedReason(err?.deactivation_reason || '');
         setDeactivatedModalVisible(true);
+      } else {
+        showToast(err.message || 'Login failed. Please try again.', 'error');
       }
-      // other errors already shown via AuthContext error state in the form
     }
   };
 
@@ -336,32 +235,6 @@ export default function LoginScreen() {
                 )}
               </LinearGradient>
             </TouchableOpacity>
-
-            {/* Divider */}
-            <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <ThemedText style={styles.dividerText}>OR</ThemedText>
-              <View style={styles.dividerLine} />
-            </View>
-
-            {/* Google Button */}
-            {Platform.OS === 'web' && (
-              <TouchableOpacity
-                style={styles.googleButton}
-                onPress={handleGoogleSignInWeb}
-                disabled={googleLoading}
-                activeOpacity={0.8}
-              >
-                {googleLoading ? (
-                  <ActivityIndicator color="#7BA05B" />
-                ) : (
-                  <>
-                    <Ionicons name="logo-google" size={20} color="#DB4437" />
-                    <ThemedText style={styles.googleText}>Continue with Google</ThemedText>
-                  </>
-                )}
-              </TouchableOpacity>
-            )}
 
             {/* Guest Login */}
             <TouchableOpacity style={styles.guestButton} onPress={handleGuestLogin}>
