@@ -22,13 +22,13 @@ try:
     import firebase_admin
     from firebase_admin import credentials as fb_credentials
     if not firebase_admin._apps:
-        _fb_cred_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "firebase-admin.json")
+        _fb_cred_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "firebase_admin.json")
         if os.path.exists(_fb_cred_path):
             _fb_cred = fb_credentials.Certificate(_fb_cred_path)
             firebase_admin.initialize_app(_fb_cred)
             print("[OK] Firebase Admin initialized")
         else:
-            print("[WARN] firebase-admin.json not found – Firebase Admin not initialized")
+            print("[WARN] firebase_admin.json not found – Firebase Admin not initialized")
 except Exception as _fb_err:
     print(f"[WARN] Firebase Admin init error: {_fb_err}")
 
@@ -69,6 +69,8 @@ def create_app(config_name="development"):
     app.config["SECRET_KEY"] = os.getenv(
         "SECRET_KEY", app.config.get("SECRET_KEY")
     )
+    # Make NGROK_URL available everywhere in Flask config
+    app.config["NGROK_URL"] = os.getenv("NGROK_URL")
 
     # ==================================================
     # EMAIL CONFIGURATION (Mailtrap)
@@ -100,6 +102,7 @@ def create_app(config_name="development"):
         ngrok_url,
         ngrok_url.strip(),
         "https://ruthie-unablative-amiya.ngrok-free.dev",  # Legacy ngrok URL
+        "https://snapshroom-web.onrender.com",
     ]
     
     CORS(
