@@ -68,7 +68,7 @@ export default function HistoryScreen() {
         headers['Authorization'] = `Bearer ${accessToken}`;
       }
 
-      const response = await fetch(`${API_URL}/api/toxicity/scans/history?limit=10000&scope=${scope}`, {
+      const response = await fetch(`${API_URL}/toxicity/scans/history?limit=10000&scope=${scope}`, {
         headers,
       });
 
@@ -96,7 +96,7 @@ export default function HistoryScreen() {
   const executeDeleteScan = async (scanId: string) => {
     setDeleteConfirmId(null);
     try {
-      const response = await fetch(`${API_URL}/api/toxicity/scans/${scanId}`, {
+      const response = await fetch(`${API_URL}/toxicity/scans/${scanId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

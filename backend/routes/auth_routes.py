@@ -278,18 +278,23 @@ def register():
 def login():
     try:
         data = request.get_json()
+        print("[DEBUG] Login request data:", data)
         mongo = current_app.mongo
 
         email = data.get("email", "").lower().strip()
         password = data.get("password", "")
+        print(f"[DEBUG] Email: {email}, Password Provided: {bool(password)}")
 
         if not email or not password:
+            print("[DEBUG] Missing email or password")
             return jsonify({"success": False, "message": "Email and password required"}), 400
 
         # Look up user regardless of is_active first so we can give a specific message
         user = mongo.db.users.find_one({"email": email})
+        print("[DEBUG] User found:", bool(user))
 
         if not user or not check_password_hash(user["password_hash"], password):
+            print("[DEBUG] Invalid credentials")
             return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
         # Check if account is disabled
@@ -298,6 +303,7 @@ def login():
             msg = "Your account has been deactivated."
             if reason:
                 msg = f"Your account has been deactivated for the following reason: {reason}"
+            print(f"[DEBUG] Account disabled: {msg}")
             return jsonify({
                 "success": False,
                 "message": msg,
@@ -307,6 +313,7 @@ def login():
 
         # Check Firebase email verification (handles existing users not yet in Firebase)
         fb = _ensure_firebase_user_and_verify(email)
+        print("[DEBUG] Firebase verification:", fb)
         if not fb['verified']:
             msg = (
                 "A verification email has been sent. Please verify your email before logging in."
