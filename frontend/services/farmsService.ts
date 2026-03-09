@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000/api';
+// Always use the base URL WITHOUT /api at the end in .env
+// Append /api in code only
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000';
 
 export interface Farm {
   id: string;
@@ -24,8 +26,9 @@ export const farmsService = {
   // Get all farms
   getFarms: async (type: string = 'farm'): Promise<FarmsResponse> => {
     try {
-      const response = await axios.get(`${API_URL}/farms`, {
-        params: { type }
+      const response = await axios.get(`${API_BASE_URL}/api/farms`, {
+        params: { type },
+        headers: { 'ngrok-skip-browser-warning': 'true' },
       });
       return response.data;
     } catch (error: any) {
@@ -42,7 +45,9 @@ export const farmsService = {
   // Get specific farm by ID
   getFarm: async (farmId: string): Promise<{ success: boolean; farm?: Farm; error?: string }> => {
     try {
-      const response = await axios.get(`${API_URL}/farms/${farmId}`);
+      const response = await axios.get(`${API_BASE_URL}/api/farms/${farmId}`, {
+        headers: { 'ngrok-skip-browser-warning': 'true' },
+      });
       return response.data;
     } catch (error: any) {
       console.error('Error fetching farm:', error);

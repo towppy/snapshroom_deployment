@@ -90,7 +90,10 @@ const STORAGE_KEYS = {
 export const api = axios.create({
   baseURL: API_URL,
   timeout: 10000,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
+  },
 });
 
 // Request interceptor (fixed TS issue)

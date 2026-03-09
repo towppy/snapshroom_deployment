@@ -64,6 +64,7 @@ export default function HistoryScreen() {
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
       };
       if (accessToken) {
         headers['Authorization'] = `Bearer ${accessToken}`;
@@ -101,6 +102,7 @@ export default function HistoryScreen() {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
       });

@@ -121,7 +121,9 @@ export default function MapScreen() {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_URL}/api/species/all`);
+      const response = await fetch(`${API_URL}/api/species/all`, {
+        headers: { 'ngrok-skip-browser-warning': 'true' },
+      });
       const data = await response.json();
 
       if (data.success && data.species) {
