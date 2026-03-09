@@ -14,9 +14,8 @@ export const API_URL_NETWORK = `http://${BACKEND_IP}:${BACKEND_PORT}`;
 // ngrok forwarding (from .env)
 export const API_URL_NGROK = NGROK_URL;
 
-// Active API URL - change this to switch between local and remote
-// Default to localhost-based URL; override via env when needed.
-export const API_URL = API_URL_LOCAL;
+// Active API URL - now uses ngrok by default, falls back to localhost if not set
+export const API_URL = process.env.EXPO_PUBLIC_API_URL || API_URL_NGROK || API_URL_LOCAL;
 
 // Alternative configurations:
 // export const API_URL = API_URL_LOCAL;      // Use localhost
