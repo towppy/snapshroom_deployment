@@ -11,6 +11,7 @@ import {
   Dimensions,
   Modal,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -98,6 +99,8 @@ const Divider = () => <View style={styles.divider} />;
 export default function PredictionScreen() {
   const { imageUri, imageBase64, cloudinaryUrl } = useLocalSearchParams();
   const router = useRouter();
+  const { width: screenWidth } = useWindowDimensions();
+  const isMobileWeb = isWeb && screenWidth < 768;
   const { user } = useContext(AuthContext) as {
     user: { id: string; email: string; name?: string; username?: string } | null;
   } || {};
@@ -664,7 +667,7 @@ export default function PredictionScreen() {
             <Ionicons name="map" size={22} color="#1976D2" />
             <Text style={styles.sectionTitle}>Where to Find This Mushroom</Text>
           </View>
-          <View style={{ borderRadius: 12, overflow: 'hidden', height: 520 }}>
+          <View style={{ borderRadius: 12, overflow: 'hidden', height: isMobileWeb ? 480 : 520 }}>
             {/* @ts-ignore */}
             <iframe
               srcDoc={mapHtml}
@@ -839,8 +842,8 @@ export default function PredictionScreen() {
     );
   }
 
-  // ── WEB LAYOUT ──────────────────────────────────────────────────────────────
-  if (isWeb) {
+  // ── WEB LAYOUT (desktop only — mobile web falls through to mobile layout) ──
+  if (isWeb && !isMobileWeb) {
     return (
       <>
         <View style={webStyles.pageWrapper}>

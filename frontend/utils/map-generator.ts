@@ -210,8 +210,23 @@ const sharedStyles = `
 
   .locations-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 12px;
+  }
+
+  @media (max-width: 400px) {
+    .locations-grid {
+      grid-template-columns: 1fr;
+    }
+    body { padding: 8px; }
+    .header { padding: 20px 16px; }
+    .header h1 { font-size: 22px; }
+    .header::after { font-size: 50px; right: 16px; }
+    .locations-list { padding: 16px; }
+    .legend { padding: 16px; }
+    .stat-card { padding: 12px 8px; }
+    .stat-card .value { font-size: 22px; }
+    #map { height: 300px; }
   }
 
   .location-item {

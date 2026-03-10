@@ -10,6 +10,7 @@ import {
   RefreshControl,
   Alert,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -44,6 +45,8 @@ const isWeb = Platform.OS === 'web';
 export default function HistoryScreen() {
   const router = useRouter();
   const { user, accessToken } = useAuth();
+  const { width: screenWidth } = useWindowDimensions();
+  const isMobileWeb = isWeb && screenWidth < 768;
   const [scans, setScans] = useState<ScanRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -70,7 +73,7 @@ export default function HistoryScreen() {
         headers['Authorization'] = `Bearer ${accessToken}`;
       }
 
-      const response = await fetch(`${API_URL}/toxicity/scans/history?limit=10000&scope=${scope}`, {
+      const response = await fetch(`${API_URL}/api/toxicity/scans/history?limit=10000&scope=${scope}`, {
         headers,
       });
 
@@ -98,7 +101,7 @@ export default function HistoryScreen() {
   const executeDeleteScan = async (scanId: string) => {
     setDeleteConfirmId(null);
     try {
-      const response = await fetch(`${API_URL}/toxicity/scans/${scanId}`, {
+      const response = await fetch(`${API_URL}/api/toxicity/scans/${scanId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -398,8 +401,8 @@ export default function HistoryScreen() {
     </View>
   );
 
-  // ── WEB LAYOUT ─────────────────────────────────────────────────────────────
-  if (isWeb) {
+  // ── WEB LAYOUT (desktop only — mobile web falls through to mobile layout) ──
+  if (isWeb && !isMobileWeb) {
     const filtered = getFilteredScans();
 
     const filterOptions: { key: typeof activeFilter; label: string; icon: string }[] = [

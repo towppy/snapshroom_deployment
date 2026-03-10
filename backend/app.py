@@ -22,13 +22,13 @@ try:
     import firebase_admin
     from firebase_admin import credentials as fb_credentials
     if not firebase_admin._apps:
-        _fb_cred_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "firebase-admin.json")
+        _fb_cred_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "firebase_admin.json")
         if os.path.exists(_fb_cred_path):
             _fb_cred = fb_credentials.Certificate(_fb_cred_path)
             firebase_admin.initialize_app(_fb_cred)
             print("[OK] Firebase Admin initialized")
         else:
-            print("[WARN] firebase-admin.json not found – Firebase Admin not initialized")
+            print("[WARN] firebase_admin.json not found – Firebase Admin not initialized")
 except Exception as _fb_err:
     print(f"[WARN] Firebase Admin init error: {_fb_err}")
 
@@ -69,6 +69,8 @@ def create_app(config_name="development"):
     app.config["SECRET_KEY"] = os.getenv(
         "SECRET_KEY", app.config.get("SECRET_KEY")
     )
+    # Make NGROK_URL available everywhere in Flask config
+    app.config["NGROK_URL"] = os.getenv("NGROK_URL")
 
     # ==================================================
     # EMAIL CONFIGURATION (Mailtrap)
@@ -85,33 +87,18 @@ def create_app(config_name="development"):
     app.config['FRONTEND_URL'] = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 
     # ==================================================
-    # CORS (FIXED)
+    # CORS — open to all origins (safe: auth uses JWT in
+    # Authorization header, not cookies)
     # ==================================================
-    # Read IP and ports from environment variables
-    backend_ip = os.getenv("BACKEND_IP", "192.168.1.102")
-    frontend_port = os.getenv("FRONTEND_PORT", "8081")
-    ngrok_url = os.getenv("NGROK_URL", "https://eastwardly-retreatal-kerstin.ngrok-free.dev")
-    
-    allowed_origins = [
-        "http://localhost:8081",
-        "http://localhost:19006",
-        "http://localhost:3000",
-        f"http://{backend_ip}:{frontend_port}",
-        ngrok_url,
-        ngrok_url.strip(),
-        "https://ruthie-unablative-amiya.ngrok-free.dev",  # Legacy ngrok URL
-    ]
-    
     CORS(
         app,
         resources={
             r"/*": {
-                "origins": allowed_origins,
-                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+                "origins": "*",
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
                 "allow_headers": [
                     "Content-Type",
                     "Authorization",
-                    "Access-Control-Allow-Credentials",
                     "X-Forwarded-Proto",
                     "ngrok-skip-browser-warning"
                 ],
@@ -119,11 +106,34 @@ def create_app(config_name="development"):
                     "Content-Type",
                     "Authorization"
                 ],
-                "supports_credentials": True,
-                "max_age": 3600
+                "max_age": 86400
             }
         }
     )
+
+    # Explicit OPTIONS handler — guarantees preflight always succeeds
+    @app.before_request
+    def handle_preflight():
+        if request.method == "OPTIONS":
+            resp = app.make_default_options_response()
+            origin = request.headers.get("Origin")
+            resp.headers["Access-Control-Allow-Origin"] = origin if origin else "*"
+            resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+            resp.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, ngrok-skip-browser-warning"
+            resp.headers["Access-Control-Max-Age"] = "86400"
+            if origin:
+                resp.headers["Access-Control-Allow-Credentials"] = "true"
+            return resp
+
+    @app.after_request
+    def add_cors_headers(response):
+        origin = request.headers.get("Origin")
+        response.headers["Access-Control-Allow-Origin"] = origin if origin else "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, ngrok-skip-browser-warning"
+        if origin:
+            response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response
 
 
 
@@ -289,7 +299,6 @@ def register_blueprints(app):
         sys.stdout.flush()
         from routes.toxicity_routes_custom import toxicity_bp
         app.register_blueprint(toxicity_bp, url_prefix="/api/toxicity")
-        app.register_blueprint(toxicity_bp, url_prefix="/toxicity", name="toxicity_custom_alt")
         print("[OK] Toxicity/Detection routes loaded (Custom Model)")
         sys.stdout.flush()
     except Exception as e:

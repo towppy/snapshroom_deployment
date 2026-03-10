@@ -84,7 +84,7 @@ class ApiService {
   async analyzeMushroom(
     data: MushroomAnalysisRequest
   ): Promise<MushroomAnalysisResponse> {
-    const url = `${this.baseUrl}/toxicity/predict`;
+    const url = `${this.baseUrl}/api/toxicity/predict`;
 
     try {
       console.log('📡 POST', url);
@@ -156,7 +156,7 @@ class ApiService {
   // HEALTH CHECK
   // ---------------------------------------------------
   async testConnection(): Promise<boolean> {
-    const url = `${this.baseUrl}/health`;
+    const url = `${this.baseUrl}/api/health`;
 
     try {
       console.log('🔍 Testing backend:', url);
@@ -207,7 +207,7 @@ export const testConnection = () =>
 // ---------------------------------------------------
 
 export const searchSpecies = async (query: string): Promise<any[]> => {
-  const url = `${API_BASE_URL}/species/search?q=${encodeURIComponent(query)}`;
+  const url = `${API_BASE_URL}/api/species/search?q=${encodeURIComponent(query)}`;
 
   try {
     console.log('🔍 Searching species API:', query);

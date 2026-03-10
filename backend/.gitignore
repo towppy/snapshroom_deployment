@@ -68,3 +68,4 @@ datasets/
 
 backend/models/firebase_admin.json
 backend/firebase-admin.json
+firebase_admin.json

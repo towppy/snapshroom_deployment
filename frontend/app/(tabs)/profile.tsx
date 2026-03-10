@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -21,6 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 import HamburgerMenu from '@/components/HamburgerMenu';
 import NotificationDropdown from '@/components/NotificationDropdown';
 import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
 
 type EditMode = 'none' | 'name' | 'password';
 
@@ -46,6 +47,7 @@ const C = {
 
 export default function ProfileScreen() {
   const { user, logout, refreshUser } = useAuth();
+  const router = useRouter();
   const { showToast } = useToast();
   const [editMode, setEditMode] = useState<EditMode>('none');
   const [loading, setLoading] = useState(false);
@@ -61,13 +63,11 @@ export default function ProfileScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPasswords, setShowPasswords] = useState({ old: false, new: false, confirm: false });
 
-  if (!user) {
-    return (
-      <ThemedView style={s.container}>
-        <ThemedText>Loading...</ThemedText>
-      </ThemedView>
-    );
-  }
+  useEffect(() => {
+    if (!user) router.replace('/');
+  }, [user]);
+
+  if (!user) return null;
 
   /* ── All functions below are UNCHANGED ── */
 
@@ -465,7 +465,7 @@ const s = StyleSheet.create({
   topHeader: {
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'ios' ? 52 : Platform.OS === 'android' ? 36 : 16,
+    paddingTop: Platform.OS === 'ios' ? 52 : Platform.OS === 'android' ? 36 : 20,
     paddingBottom: 12,
     backgroundColor: C.dark,
     borderBottomWidth: 1, borderBottomColor: `${C.forest}60`,

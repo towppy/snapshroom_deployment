@@ -1,0 +1,19 @@
+{
+  "buildCommand": "npx expo export -p web",
+  "outputDirectory": "dist",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS, PATCH" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, ngrok-skip-browser-warning" },
+        { "key": "Referrer-Policy", "value": "no-referrer-when-downgrade" },
+        { "key": "Permissions-Policy", "value": "camera=(*), geolocation=(*), microphone=()" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

@@ -357,7 +357,7 @@ export default function AdminDashboard() {
     return {
       labels:     filtered.map(i => formatBarLabel(i.label)),
       datasets:   [{ data: filtered.map(i => i.value) }],
-      chartWidth: Math.max(CHART_W, filtered.length * BAR_ITEM_W),
+      chartWidth: IS_WIDE ? Math.max(CHART_W, filtered.length * BAR_ITEM_W) : FULL_CHART_W,
     };
   };
 
@@ -628,10 +628,10 @@ export default function AdminDashboard() {
           <View style={halfStyle}>
             <Card style={s.mb0}>
               {timeline && timeline.length > 0 ? (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} scrollEnabled={IS_WIDE}>
                   <LineChart
                     data={{ labels: timelineLabels(timeline), datasets: [{ data: timeline.map(t => t.scans) }] }}
-                    width={Math.max(CHART_W, timeline.length * (IS_WIDE ? 32 : 52))}
+                    width={IS_WIDE ? Math.max(CHART_W, timeline.length * 32) : FULL_CHART_W}
                     height={200}
                     chartConfig={mushroomChartConfig}
                     bezier
@@ -866,7 +866,7 @@ export default function AdminDashboard() {
         <View style={rowStyle}>
           <View style={halfStyle}>
             <Card style={s.mb0}>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} scrollEnabled={IS_WIDE}>
                 <BarChart
                   data={{
                     labels: ['Active', 'Inactive', 'Admins'],
@@ -875,7 +875,7 @@ export default function AdminDashboard() {
                       colors: [() => C.success, () => C.danger, () => C.moss],
                     }],
                   }}
-                  width={Math.max(CHART_W, 3 * BAR_ITEM_W)}
+                  width={IS_WIDE ? Math.max(CHART_W, 3 * BAR_ITEM_W) : FULL_CHART_W}
                   height={200}
                   fromZero
                   showValuesOnTopOfBars
@@ -910,10 +910,10 @@ export default function AdminDashboard() {
           <>
             <SectionHeader title="Scan Timeline" subtitle="Daily scan activity" emoji="📈" />
             <Card>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} scrollEnabled={false}>
                 <LineChart
                   data={{ labels: timelineLabels(timeline), datasets: [{ data: timeline.map(t => t.scans) }] }}
-                  width={Math.max(FULL_CHART_W, timeline.length * 52)}
+                  width={FULL_CHART_W}
                   height={200}
                   chartConfig={chartConfig}
                   bezier
@@ -953,7 +953,7 @@ export default function AdminDashboard() {
             <View style={rowStyle}>
               <View style={halfStyle}>
                 <Card style={s.mb0}>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} scrollEnabled={IS_WIDE}>
                     {(() => {
                       const bd = safeBarData(M.most_scanned_mushrooms.map(m => ({ label: m.name, value: m.count })));
                       return (
@@ -1155,7 +1155,7 @@ const s = StyleSheet.create({
   topHeader: {
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'ios' ? 52 : Platform.OS === 'android' ? 36 : 16,
+    paddingTop: Platform.OS === 'ios' ? 52 : Platform.OS === 'android' ? 36 : 20,
     paddingBottom: 12,
     backgroundColor: C.dark,
     borderBottomWidth: 1, borderBottomColor: `${C.forest}60`,

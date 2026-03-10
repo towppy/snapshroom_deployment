@@ -63,9 +63,9 @@ export default function HamburgerMenu({ onAdminNavigate, currentSection }: Hambu
 
   const userMenuItems = [
     { label: 'Home', icon: 'home', route: '/' },
-    { label: 'Capture', icon: 'camera', route: '/(tabs)/camera' },
+    ...(user ? [{ label: 'Capture', icon: 'camera', route: '/(tabs)/camera' }] : []),
     { label: 'History', icon: 'time', route: '/history' },
-    { label: 'Profile', icon: 'person', route: '/(tabs)/profile' },
+    ...(user ? [{ label: 'Profile', icon: 'person', route: '/(tabs)/profile' }] : []),
     { label: 'Map', icon: 'map', route: '/(tabs)/map' },
     { label: 'About', icon: 'information-circle', route: '/(tabs)/about' },
   ];

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Platform, ActivityIndicator, Image, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Platform, ActivityIndicator, Image, Modal, useWindowDimensions } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,18 +9,38 @@ import { API_URL } from '@/constants/api';
 import GoogleMap from '@/components/GoogleMap';
 import { farmsService, Farm } from '@/services/farmsService';
 
-// Mushroom image mapping (placeholder for now - replace with actual images)
+// Mushroom image mapping
 const MUSHROOM_IMAGES: Record<string, any> = {
-  'Oyster Mushroom': require('@/assets/images/mushrooms/oyster-mushroom.jpg'), // Replace with actual image
+  'Oyster Mushroom': require('@/assets/images/mushrooms/oyster-mushroom.jpg'),
   'Enoki Mushroom': require('@/assets/images/mushrooms/enoki-mushroom.jpg'),
   'Button Mushroom': require('@/assets/images/mushrooms/button-mushroom.jpg'),
   'Shiitake': require('@/assets/images/mushrooms/shiitake-mushroom.jpg'),
+  'Shiitake Mushroom': require('@/assets/images/mushrooms/shiitake-mushroom.jpg'),
   'Wood Ear': require('@/assets/images/mushrooms/wood-ear.jpg'),
+  'Wood Ear Mushroom': require('@/assets/images/mushrooms/wood-ear.jpg'),
   'Death Cap': require('@/assets/images/mushrooms/death-cap.jpg'),
   'False Morel': require('@/assets/images/mushrooms/false-morel.jpg'),
   'Jack O Lantern': require('@/assets/images/mushrooms/jack-o-lantern.jpg'),
+  "Jack O' Lantern": require('@/assets/images/mushrooms/jack-o-lantern.jpg'),
+  "Jack O' Lantern Mushroom": require('@/assets/images/mushrooms/jack-o-lantern.jpg'),
+  'Jack O Lantern Mushroom': require('@/assets/images/mushrooms/jack-o-lantern.jpg'),
   'Funeral Bell': require('@/assets/images/mushrooms/funeral-bell.jpg'),
+  'Funeral Bell Mushroom': require('@/assets/images/mushrooms/funeral-bell.jpg'),
   'Red Cage': require('@/assets/images/mushrooms/red-cage.jpg'),
+  'Red Cage Fungus': require('@/assets/images/mushrooms/red-cage.jpg'),
+};
+
+// Normalised image lookup — strips common suffixes so DB names match
+const getMushroomImage = (name: string): any => {
+  if (!name) return null;
+  if (MUSHROOM_IMAGES[name]) return MUSHROOM_IMAGES[name];
+  // Try stripping " Mushroom" / " Fungus" suffix
+  const stripped = name.replace(/\s+(Mushroom|Fungus)$/i, '').trim();
+  if (MUSHROOM_IMAGES[stripped]) return MUSHROOM_IMAGES[stripped];
+  // Case-insensitive fallback
+  const lower = name.toLowerCase();
+  const key = Object.keys(MUSHROOM_IMAGES).find(k => k.toLowerCase() === lower);
+  return key ? MUSHROOM_IMAGES[key] : null;
 };
 
 // Coordinate mapping for Philippine regions/provinces from database location field
@@ -82,7 +102,11 @@ interface MushroomLocation {
   habitat?: string;
 }
 
+const isWeb = Platform.OS === 'web';
+
 export default function MapScreen() {
+  const { width: screenWidth } = useWindowDimensions();
+  const isMobileWeb = isWeb && screenWidth < 768;
   const [mushroomLocations, setMushroomLocations] = useState<MushroomLocation[]>([]);
   const [farmLocations, setFarmLocations] = useState<any[]>([]); // Add farm locations state
   const [showFarms, setShowFarms] = useState(false); // Toggle for farm markers
@@ -334,7 +358,7 @@ export default function MapScreen() {
                 Examples of edible and poisonous mushrooms found across the Philippines
               </ThemedText>
 
-              <View style={styles.examplesGrid}>
+              <View style={[styles.examplesGrid, isWeb && !isMobileWeb && { flexDirection: 'row' }]}>
                 {/* Edible Example */}
                 {edibleMushroom && (
                   <View style={styles.exampleCard}>
@@ -370,7 +394,7 @@ export default function MapScreen() {
                     >
                       <View style={styles.mushroomImageWrap}>
                         <Image
-                          source={MUSHROOM_IMAGES[edibleMushroom.name] || require('@/assets/images/react-logo.png')}
+                          source={getMushroomImage(edibleMushroom.name) || require('@/assets/images/react-logo.png')}
                           style={styles.mushroomImage}
                           resizeMode="cover"
                         />
@@ -431,7 +455,7 @@ export default function MapScreen() {
                     >
                       <View style={styles.mushroomImageWrap}>
                         <Image
-                          source={MUSHROOM_IMAGES[poisonousMushroom.name] || require('@/assets/images/react-logo.png')}
+                          source={getMushroomImage(poisonousMushroom.name) || require('@/assets/images/react-logo.png')}
                           style={styles.mushroomImage}
                           resizeMode="cover"
                         />
@@ -523,7 +547,7 @@ export default function MapScreen() {
 
                   <View style={styles.modalImageWrap}>
                     <Image
-                      source={MUSHROOM_IMAGES[selectedMushroom.name] || require('@/assets/images/react-logo.png')}
+                      source={getMushroomImage(selectedMushroom.name) || require('@/assets/images/react-logo.png')}
                       style={styles.modalImage}
                       resizeMode="cover"
                     />
@@ -799,7 +823,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   examplesGrid: {
-    flexDirection: Platform.OS === 'web' ? 'row' : 'column',
+    flexDirection: 'column',
     gap: 16,
     paddingHorizontal: 20,
   },
@@ -839,7 +863,7 @@ const styles = StyleSheet.create({
   },
   mushroomImageWrap: {
     width: '100%',
-    height: Platform.OS === 'web' ? 200 : 180,
+    height: 180,
     backgroundColor: '#F5F3EF',
     position: 'relative',
   },
@@ -966,7 +990,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    width: Platform.OS === 'web' ? '50%' : '90%',
+    width: '90%' as any,
+    maxWidth: 600,
     maxHeight: '80%',
     backgroundColor: '#FFF',
     borderRadius: 20,
@@ -1002,7 +1027,7 @@ const styles = StyleSheet.create({
   },
   modalImageWrap: {
     width: '100%',
-    height: Platform.OS === 'web' ? 300 : 250,
+    height: 250,
     backgroundColor: '#F5F3EF',
     position: 'relative',
   },

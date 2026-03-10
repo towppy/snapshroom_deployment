@@ -801,7 +801,7 @@ export default function LandingPage() {
           right: 0,
           zIndex: 100,
           backgroundColor: headerBg,
-          paddingTop: Platform.OS === 'ios' ? 50 : Platform.OS === 'android' ? 32 : 0,
+          paddingTop: Platform.OS === 'ios' ? 50 : Platform.OS === 'android' ? 32 : 20,
         }}
       >
         <View

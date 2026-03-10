@@ -11,11 +11,12 @@ const checkForMushroom = async (base64: string, photoUri?: string): Promise<{ is
     // on the same machine works without a hard-coded LAN IP.
     const BACKEND_IP = process.env.EXPO_PUBLIC_BACKEND_IP || 'localhost';
     const BACKEND_PORT = process.env.EXPO_PUBLIC_BACKEND_PORT || '5000';
-    const apiUrl = process.env.EXPO_PUBLIC_API_URL || `http://${BACKEND_IP}:${BACKEND_PORT}/api`;
-    const response = await fetch(`${apiUrl}/toxicity/detect`, {
+    const apiUrl = process.env.EXPO_PUBLIC_API_URL || `http://${BACKEND_IP}:${BACKEND_PORT}`;
+    const response = await fetch(`${apiUrl}/api/toxicity/detect`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
       },
       body: JSON.stringify({
         image_base64: cleanBase64,
@@ -60,6 +61,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/contexts/AuthContext';
 
 const { width, height } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
@@ -108,6 +110,7 @@ export default function CameraScreen() {
   const [showExamples, setShowExamples] = useState(true);
   const cameraRef = useRef<CameraView>(null);
   const router = useRouter();
+  const { user } = useAuth();
   
   // Animations
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -133,6 +136,10 @@ export default function CameraScreen() {
       ])
     ).start();
   }, []);
+
+  useEffect(() => {
+    if (user === null) router.replace('/');
+  }, [user]);
 
   useEffect(() => {
     (async () => {

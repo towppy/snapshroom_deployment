@@ -786,6 +786,7 @@ export default function LandingPage() {
 
   // Layout is responsive: on web/wide screens use side-by-side, on mobile stack
   const isWide = isWeb && width >= 768;
+  const isMobileWeb = isWeb && width < 768;
 
   return (
     <View style={{ flex: 1, backgroundColor: C.cream }}>
@@ -801,7 +802,7 @@ export default function LandingPage() {
           right: 0,
           zIndex: 100,
           backgroundColor: headerBg,
-          paddingTop: Platform.OS === 'ios' ? 50 : Platform.OS === 'android' ? 32 : 0,
+          paddingTop: Platform.OS === 'ios' ? 50 : Platform.OS === 'android' ? 32 : isMobileWeb ? 36 : 0,
         }}
       >
         <View

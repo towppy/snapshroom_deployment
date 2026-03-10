@@ -166,7 +166,7 @@ const TeamCard = ({ member, accent = C.moss, isWide }: { member: any; accent?: s
       {/* Info */}
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: isWide ? 15 : 14, fontWeight: '800', color: C.dark, marginBottom: 4, lineHeight: 20 }}>{member.name}</Text>
-        <Text style={{ fontSize: 12, color: C.sage, fontWeight: '600', marginBottom: SP.sm, fontStyle: 'italic' }}>{member.bio}</Text>
+        <Text style={{ fontSize: 12, color: C.sage, fontWeight: '600', marginBottom: SP.sm, fontStyle: 'italic' }} numberOfLines={1} ellipsizeMode="tail">{member.bio}</Text>
         <View style={{ backgroundColor: `${accent}18`, paddingHorizontal: SP.md, paddingVertical: 4, borderRadius: 8, alignSelf: 'flex-start' }}>
           <Text style={{ fontSize: 11, color: accent, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.8 }}>{member.role}</Text>
         </View>
@@ -207,7 +207,7 @@ export default function AboutPage() {
       <Animated.View style={{
         position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100,
         backgroundColor: headerBg,
-        paddingTop: Platform.OS === 'ios' ? 50 : Platform.OS === 'android' ? 32 : 0,
+        paddingTop: Platform.OS === 'ios' ? 50 : Platform.OS === 'android' ? 32 : 20,
       }}>
         <View style={{
           flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',

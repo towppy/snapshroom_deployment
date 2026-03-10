@@ -1,0 +1,14 @@
+node_modules/
+.expo/
+web-build/
+dist/
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+.DS_Store
+*.tsbuildinfo
+ios/
+android/
+__pycache__/
+*.pyc
